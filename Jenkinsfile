@@ -3,9 +3,7 @@ pipeline {
     tools {
         jdk 'jdk17'
         nodejs '21.6.2'
-    }
-    environment {
-        SCANNER_HOME = tool 'sonar-scanner'
+        maven 'Maven3.9.6'
     }
     stages {
         stage('clean workspace') {
@@ -19,10 +17,13 @@ pipeline {
             }
         }
         stage("Sonarqube Analysis") {
+            environment {
+                SONAR_URL = 'http://3.101.138.146:9000'
+            }
             steps {
-                withSonarQubeEnv('sonar-server') {
-                    sh '''$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Netflix \
-                    -Dsonar.projectKey=Netflix'''
+                withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_TOKEN')]) {
+                    sh 'mvn sonar:sonar - Dsonar.login=${SONAR_TOKEN -Dsonar.host.url=${SONAR_URL}'
+                }
                 }
             }
         }
